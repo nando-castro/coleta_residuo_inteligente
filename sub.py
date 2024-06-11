@@ -2,8 +2,8 @@ import time
 
 from paho.mqtt import client as mqtt_client
 
-from connectInterscity import (addData_API,  # Importe as funções necessárias
-                               prepare_API)
+from connectInterscity import addData_API  # Importe as funções necessárias
+from connectInterscity import prepare_API
 
 # Configurações de conexão ao Broker
 broker = 'mqtt.eclipseprojects.io'
@@ -37,6 +37,14 @@ def subscribe(client):
 
         # Salva os dados no CSV
         df.to_csv(csv_path, index=False)
+
+        # Envia os dados para a API Interscity
+        data = {
+            'timestamp': timestamp,
+            'topic': msg.topic,
+            'payload': msg.payload.decode()
+        }
+        addData_API(data)
 
     client.subscribe(topic_subscribe)
     client.on_message = on_message
